@@ -47,7 +47,8 @@ const companies = [
   {
     id: "1efecb2bf6a51def9869ab0f",
     createdAt: "04/04/2019",
-    description: "Lyft is an on-demand transportation company based in San Francisco, California.",
+    description:
+      "Lyft is an on-demand transportation company based in San Francisco, California.",
     logo: "/assets/logos/logo-lyft.png",
     title: "Lyft",
     downloads: "406",
@@ -55,7 +56,8 @@ const companies = [
   {
     id: "1ed68149f65fbc6089b5fd07",
     createdAt: "04/04/2019",
-    description: "GitHub is a web-based hosting service for version control of code using Git.",
+    description:
+      "GitHub is a web-based hosting service for version control of code using Git.",
     logo: "/assets/logos/logo-github.png",
     title: "GitHub",
     downloads: "835",

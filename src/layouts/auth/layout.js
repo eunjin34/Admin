@@ -3,8 +3,6 @@ import NextLink from "next/link";
 import { Box, Typography, Unstable_Grid2 as Grid } from "@mui/material";
 import { Logo } from "src/components/logo";
 
-// TODO: Change subtitle text
-
 export const Layout = (props) => {
   const { children } = props;
 
@@ -56,7 +54,8 @@ export const Layout = (props) => {
           lg={6}
           sx={{
             alignItems: "center",
-            background: "radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)",
+            background:
+              "radial-gradient(50% 50% at 50% 50%, #122647 0%, #090E23 100%)",
             color: "white",
             display: "flex",
             justifyContent: "center",
@@ -65,6 +64,7 @@ export const Layout = (props) => {
             },
           }}
         >
+          {/* 로그인 오른쪽 화면 */}
           <Box sx={{ p: 3 }}>
             <Typography
               align="center"

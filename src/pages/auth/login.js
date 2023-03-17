@@ -23,6 +23,7 @@ import { AlertModal } from "src/components/Modal/AlertModal";
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
+
   const [method, setMethod] = useState("email");
   const formik = useFormik({
     initialValues: {
@@ -31,7 +32,10 @@ const Page = () => {
       submit: null,
     },
     validationSchema: Yup.object({
-      email: Yup.string().email("Must be a valid email").max(255).required("Email is required"),
+      email: Yup.string()
+        .email("Must be a valid email")
+        .max(255)
+        .required("Email is required"),
       password: Yup.string().max(255).required("Password is required"),
     }),
     onSubmit: async (values, helpers) => {
@@ -50,15 +54,37 @@ const Page = () => {
     setMethod(value);
   }, []);
 
-  const handleSkip = useCallback(() => {
-    auth.skip();
-    router.push("/");
-  }, [auth, router]);
+  // const handleSkip = useCallback(() => {
+  //   auth.skip();
+  //   router.push("/");
+  // }, [auth, router]);
 
   const [open, setOpen] = useState(false);
   const handleClose = () => {
     setOpen(false);
   };
+
+  // // 파이어베이스 구글 로그인
+  // const handleGoogleLogin = async () => {
+  //   const provider = new GoogleAuthProvider();
+  //   console.log(googleAuth, provider);
+  //   signInWithPopup(googleAuth, provider)
+  //     .then((data) => {
+  //       console.log(data);
+  //       // setUserData(data.user.uid);
+  //       // if(userData)login();
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       // toast({
+  //       //   title: '구글 로그인 실패',
+  //       //   status: 'error', //success:성공
+  //       //   // description: "We've created your account for you.",
+  //       //   duration: 3000,//시간
+  //       //   isClosable: true, //닫기
+  //       // });
+  //     });
+  // };
 
   return (
     <>
@@ -86,7 +112,9 @@ const Page = () => {
         >
           <div>
             <Stack spacing={1} sx={{ mb: 3 }}>
-              <Typography variant="h4">Login</Typography>
+              <Typography variant="h4" onClick={handleGoogleLogin}>
+                Login
+              </Typography>
               <Typography color="text.secondary" variant="body2">
                 Don&apos;t have an account? &nbsp;
                 <Link
@@ -117,9 +145,13 @@ const Page = () => {
                     value={formik.values.email}
                   />
                   <TextField
-                    error={!!(formik.touched.password && formik.errors.password)}
+                    error={
+                      !!(formik.touched.password && formik.errors.password)
+                    }
                     fullWidth
-                    helperText={formik.touched.password && formik.errors.password}
+                    helperText={
+                      formik.touched.password && formik.errors.password
+                    }
                     label="Password"
                     name="password"
                     onBlur={formik.handleBlur}
@@ -128,7 +160,7 @@ const Page = () => {
                     value={formik.values.password}
                   />
                 </Stack>
-                <FormHelperText sx={{ mt: 1 }}>Optionally you can skip.</FormHelperText>
+
                 {formik.errors.submit && (
                   <Typography color="error" sx={{ mt: 3 }} variant="body2">
                     {formik.errors.submit}
@@ -146,14 +178,12 @@ const Page = () => {
                 >
                   Continue
                 </Button>
-                <Button fullWidth size="large" sx={{ mt: 3 }} onClick={handleSkip}>
-                  Skip authentication
-                </Button>
-                <Alert color="primary" severity="info" sx={{ mt: 3 }}>
+                {/* <Alert color="primary" severity="info" sx={{ mt: 3 }}>
                   <div>
-                    You can use <b>demo@devias.io</b> and password <b>Password123!</b>
+                    You can use <b>demo@devias.io</b> and password{" "}
+                    <b>Password123!</b>
                   </div>
-                </Alert>
+                </Alert> */}
               </form>
             )}
             {method === "phoneNumber" && (
@@ -162,7 +192,8 @@ const Page = () => {
                   Not available in the demo
                 </Typography>
                 <Typography color="text.secondary">
-                  To prevent unnecessary costs we disabled this feature in the demo.
+                  To prevent unnecessary costs we disabled this feature in the
+                  demo.
                 </Typography>
               </div>
             )}

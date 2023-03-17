@@ -1,6 +1,7 @@
 import { Modal, Box, Button, Grid, Typography } from "@mui/material";
 import { styled } from "@mui/system";
 
+// styled
 const modalStyle = {
   position: "absolute",
   top: "50%",
@@ -12,7 +13,7 @@ const modalStyle = {
   borderRadius: "10px",
   pt: 4,
 };
-const IconBox = styled("div")((props) => ({
+const IconBox = styled("div")({
   width: "50px",
   height: "50px",
   borderRadius: "50%",
@@ -20,7 +21,7 @@ const IconBox = styled("div")((props) => ({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-}));
+});
 const CancelBtn = styled("button")({
   backgroundColor: "#fff",
   padding: "8px 30px",
@@ -40,7 +41,6 @@ const ConfrimBtn = styled("button")({
 });
 
 export const AlertModal = ({ open, onClose, text, result }) => {
-  console.log(result);
   return (
     <Modal
       open={open}
@@ -73,7 +73,9 @@ export const AlertModal = ({ open, onClose, text, result }) => {
           borderRadius="0 0 8px 8px"
         >
           <CancelBtn onClick={onClose}>취소</CancelBtn>
-          <ConfrimBtn sx={{ bgcolor: result ? "#97D292" : "#DA292E" }}>확인</ConfrimBtn>
+          <ConfrimBtn sx={{ bgcolor: result ? "#97D292" : "#DA292E" }}>
+            확인
+          </ConfrimBtn>
         </Box>
       </Box>
     </Modal>

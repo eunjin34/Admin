@@ -9,7 +9,8 @@ import { useNProgress } from "src/hooks/use-nprogress";
 import { createTheme } from "src/theme";
 import { createEmotionCache } from "src/utils/create-emotion-cache";
 import "simplebar-react/dist/simplebar.min.css";
-
+import { fbAuth } from "src/javascripts/firebaseConfig";
+import { fbApp } from "src/javascripts/firebaseConfig";
 const clientSideEmotionCache = createEmotionCache();
 
 const SplashScreen = () => null;
@@ -35,7 +36,11 @@ const App = (props) => {
             <CssBaseline />
             <AuthConsumer>
               {(auth) =>
-                auth.isLoading ? <SplashScreen /> : getLayout(<Component {...pageProps} />)
+                auth.isLoading ? (
+                  <SplashScreen />
+                ) : (
+                  getLayout(<Component {...pageProps} />)
+                )
               }
             </AuthConsumer>
           </ThemeProvider>

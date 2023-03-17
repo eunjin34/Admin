@@ -18,10 +18,12 @@ import {
 import { styled } from "@mui/system";
 import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import { CustomersTable } from "src/sections/customer/customers-table";
-import { CustomersSearch } from "src/sections/customer/customers-search";
-import { applyPagination } from "src/utils/apply-pagination";
+// import { CustomersTable } from "src/sections/customer/customers-table";
+// import { CustomersSearch } from "src/sections/customer/customers-search";
+// import { applyPagination } from "src/utils/apply-pagination";
 import Router from "next/router";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
 // import UploadFileIcon from "@mui/icons-material/UploadFile";
 
@@ -30,17 +32,18 @@ const FlexBox = styled("div")({
   display: "flex",
   justifyContent: "space-between",
   marginBottom: "20px",
-  width: "50%",
+  width: "100%",
   alignItems: "center",
   textAlign: "center",
 });
 
 const FlexBox2 = styled("div")({
   display: "flex",
-  //   justifyContent: "space-between",
+  justifyContent: "space-between",
   marginBottom: "20px",
-  width: "100%",
+  width: "49.5%",
   textAlign: "center",
+  alignItems: "center",
 });
 
 const UploadBox = styled("div")({
@@ -54,24 +57,24 @@ const UploadBox = styled("div")({
   color: "#6C6C6C",
 });
 
-const states = [
-  {
-    value: "alabama",
-    label: "Alabama",
-  },
-  {
-    value: "new-york",
-    label: "New York",
-  },
-  {
-    value: "san-francisco",
-    label: "San Francisco",
-  },
-  {
-    value: "los-angeles",
-    label: "Los Angeles",
-  },
-];
+// const states = [
+//   {
+//     value: "alabama",
+//     label: "Alabama",
+//   },
+//   {
+//     value: "new-york",
+//     label: "New York",
+//   },
+//   {
+//     value: "san-francisco",
+//     label: "San Francisco",
+//   },
+//   {
+//     value: "los-angeles",
+//     label: "Los Angeles",
+//   },
+// ];
 
 const Page = () => {
   const [values, setValues] = useState({
@@ -81,6 +84,34 @@ const Page = () => {
     phone: "",
     state: "los-angeles",
     country: "USA",
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      title: "demo@devias.io",
+      desc: "Password123!",
+      price: "300",
+      seller: "eunjin",
+      submit: null,
+    },
+    // validationSchema: Yup.object({
+    //   email: Yup.string()
+    //     .email("Must be a valid email")
+    //     .max(255)
+    //     .required("Email is required"),
+    //   password: Yup.string().max(255).required("Password is required"),
+    // }),
+    onSubmit: async (values, helpers) => {
+      console.log("123!");
+      //   try {
+      //     await auth.signIn(values.email, values.password);
+      //     router.push("/");
+      //   } catch (err) {
+      //     helpers.setStatus({ success: false });
+      //     helpers.setErrors({ submit: err.message });
+      //     helpers.setSubmitting(false);
+      //   }
+    },
   });
 
   //   const handlePageChange = useCallback((event, value) => {
@@ -108,7 +139,6 @@ const Page = () => {
     const file = e.target.files[0];
     const { name } = file;
     setFilename(name);
-    console.log(name);
     // const reader = new FileReader();
     // reader.onload = (evt) => {
     //   if (!evt?.target?.result) {
@@ -147,68 +177,81 @@ const Page = () => {
               </Stack>
               <div>
                 <Button
-                  endIcon={
+                  startIcon={
                     <SvgIcon fontSize="small">
                       <UturnLeftIcon />
                     </SvgIcon>
                   }
                   onClick={() => Router.back()}
                   variant="contained"
+                  sx={{ mr: "10px" }}
                 >
                   back
+                </Button>
+                <Button
+                  onClick={() => Router.back()}
+                  variant="contained"
+                  sx={{ bgcolor: "#E242E5" }}
+                >
+                  save
                 </Button>
               </div>
             </Stack>
             {/* container */}
-            <Box
-              component="form"
-              //   sx={{
-              //     "& .MuiTextField-root": { width: "49.5%" },
-              //   }}
-              noValidate
-              autoComplete="off"
-              bgcolor="#fff"
-              borderRadius="8px"
-              border="1px solid #E8E8E8"
-              p="1.5rem 1rem"
-            >
-              <FlexBox>
-                <TextField
-                  fullWidth
-                  required
-                  id="outlined-required"
-                  label="제목"
-                  defaultValue="Hello World"
-                />
-              </FlexBox>
-              <FlexBox>
-                <TextField
-                  fullWidth
-                  required
-                  id="outlined-required"
-                  label="설명"
-                  defaultValue="Hello World"
-                />
-              </FlexBox>
-              <FlexBox>
-                <TextField
-                  fullWidth
-                  required
-                  id="outlined-required"
-                  label="가격"
-                  defaultValue="Hello World"
-                />
-              </FlexBox>
-              <FlexBox>
-                <TextField
-                  fullWidth
-                  required
-                  id="outlined-required"
-                  label="셀러"
-                  defaultValue="Hello World"
-                />
-              </FlexBox>
-              <FlexBox>
+            <form noValidate onSubmit={formik.handleSubmit}>
+              <Box
+                component="form"
+                sx={{
+                  "& .MuiTextField-root": { width: "49.5%" },
+                }}
+                noValidate
+                autoComplete="off"
+                bgcolor="#fff"
+                borderRadius="8px"
+                border="1px solid #E8E8E8"
+                p="1.5rem 1rem"
+              >
+                <FlexBox>
+                  <TextField
+                    name="title"
+                    type="text"
+                    fullWidth
+                    required
+                    id="outlined-required"
+                    label="제목"
+                    defaultValue="Hello World"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.title}
+                  />
+                  <TextField
+                    name
+                    fullWidth
+                    required
+                    id="outlined-required"
+                    label="설명"
+                    defaultValue="Hello World"
+                  />
+                </FlexBox>
+
+                <FlexBox>
+                  <TextField
+                    fullWidth
+                    required
+                    id="outlined-required"
+                    label="가격"
+                    defaultValue="Hello World"
+                  />
+                  <TextField
+                    fullWidth
+                    required
+                    id="outlined-required"
+                    label="셀러"
+                    defaultValue="Hello World"
+                  />
+                </FlexBox>
+                {/* select */}
+                {/* <FlexBox>
                 <TextField
                   fullWidth
                   label="Select State"
@@ -225,66 +268,69 @@ const Page = () => {
                     </option>
                   ))}
                 </TextField>
-              </FlexBox>
-              <FlexBox>
-                <Typography variant="body1" width="20%">
-                  썸네일
-                </Typography>
-                <UploadBox>
-                  <Button
-                    component="label"
-                    variant="outlined"
-                    sx={{
-                      marginRight: "1rem",
-                      bgcolor: "#fff",
-                      border: "none",
-                      boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.1)",
-                      color: "#6C6C6C",
-                      fontWeight: "500",
-                      textTransform: "none",
-                    }}
-                  >
-                    Upload File
-                    <input
-                      type="file"
-                      accept=".png"
-                      hidden
-                      onChange={handleFileUpload}
-                    />
-                  </Button>
-                  {filename}
-                </UploadBox>
-              </FlexBox>
-              <FlexBox>
-                <Typography variant="body1" width="20%">
-                  fbx파일
-                </Typography>
-                <UploadBox>
-                  <Button
-                    component="label"
-                    variant="outlined"
-                    sx={{
-                      marginRight: "1rem",
-                      bgcolor: "#fff",
-                      border: "none",
-                      boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.1)",
-                      color: "#6C6C6C",
-                      fontWeight: "500",
-                      textTransform: "none",
-                    }}
-                  >
-                    Upload File
-                    <input
-                      type="file"
-                      accept=".png"
-                      hidden
-                      onChange={handleFileUpload}
-                    />
-                  </Button>
-                  {filename}
-                </UploadBox>
-              </FlexBox>
-            </Box>
+              </FlexBox> */}
+                <FlexBox>
+                  <FlexBox2>
+                    {/* <Typography variant="body1" width="20%">
+                    썸네일
+                  </Typography> */}
+                    <UploadBox>
+                      <Button
+                        component="label"
+                        variant="outlined"
+                        sx={{
+                          marginRight: "1rem",
+                          bgcolor: "#fff",
+                          border: "none",
+                          boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.1)",
+                          color: "#6C6C6C",
+                          fontWeight: "500",
+                          textTransform: "none",
+                        }}
+                      >
+                        Thumbnail File
+                        <input
+                          type="file"
+                          accept=".png"
+                          hidden
+                          onChange={handleFileUpload}
+                        />
+                      </Button>
+                      {filename}
+                    </UploadBox>
+                  </FlexBox2>
+                  <FlexBox2>
+                    {/* <Typography variant="body1" width="20%">
+                    fbx파일
+                  </Typography> */}
+                    <UploadBox>
+                      <Button
+                        component="label"
+                        variant="outlined"
+                        sx={{
+                          marginRight: "1rem",
+                          bgcolor: "#fff",
+                          border: "none",
+                          boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.1)",
+                          color: "#6C6C6C",
+                          fontWeight: "500",
+                          textTransform: "none",
+                        }}
+                      >
+                        FBX File
+                        <input
+                          type="file"
+                          accept=".png"
+                          hidden
+                          onChange={handleFileUpload}
+                        />
+                      </Button>
+                      {filename}
+                    </UploadBox>
+                  </FlexBox2>
+                </FlexBox>
+              </Box>
+            </form>
           </Stack>
         </Container>
       </Box>

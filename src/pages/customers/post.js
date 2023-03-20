@@ -16,16 +16,10 @@ import {
   TextField,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { useSelection } from "src/hooks/use-selection";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-// import { CustomersTable } from "src/sections/customer/customers-table";
-// import { CustomersSearch } from "src/sections/customer/customers-search";
-// import { applyPagination } from "src/utils/apply-pagination";
 import Router from "next/router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-
-// import UploadFileIcon from "@mui/icons-material/UploadFile";
 
 // Style
 const FlexBox = styled("div")({
@@ -57,35 +51,7 @@ const UploadBox = styled("div")({
   color: "#6C6C6C",
 });
 
-// const states = [
-//   {
-//     value: "alabama",
-//     label: "Alabama",
-//   },
-//   {
-//     value: "new-york",
-//     label: "New York",
-//   },
-//   {
-//     value: "san-francisco",
-//     label: "San Francisco",
-//   },
-//   {
-//     value: "los-angeles",
-//     label: "Los Angeles",
-//   },
-// ];
-
 const Page = () => {
-  const [values, setValues] = useState({
-    firstName: "Anika",
-    lastName: "Visser",
-    email: "demo@devias.io",
-    phone: "",
-    state: "los-angeles",
-    country: "USA",
-  });
-
   const formik = useFormik({
     initialValues: {
       title: "demo@devias.io",
@@ -94,15 +60,17 @@ const Page = () => {
       seller: "eunjin",
       submit: null,
     },
-    // validationSchema: Yup.object({
-    //   email: Yup.string()
-    //     .email("Must be a valid email")
-    //     .max(255)
-    //     .required("Email is required"),
-    //   password: Yup.string().max(255).required("Password is required"),
-    // }),
+    // 유효성검사
+    validationSchema: Yup.object({
+      email: Yup.string()
+        .email("Must be a valid email")
+        .max(255)
+        .required("Email is required"),
+      password: Yup.string().max(255).required("Password is required"),
+    }),
     onSubmit: async (values, helpers) => {
-      console.log("123!");
+      console.log(values);
+      console.log(helpers);
       //   try {
       //     await auth.signIn(values.email, values.password);
       //     router.push("/");
@@ -114,46 +82,18 @@ const Page = () => {
     },
   });
 
-  //   const handlePageChange = useCallback((event, value) => {
-  //     setPage(value);
-  //   }, []);
+  const [thumbnailFile, setThumbnailFile] = useState("No file chosen");
+  const [fbxFile, setFbxFile] = useState("No file chosen");
 
-  //   const handleRowsPerPageChange = useCallback((event) => {
-  //     setRowsPerPage(event.target.value);
-  //   }, []);
-
-  const handleChange = useCallback((event) => {
-    setValues((prevState) => ({
-      ...prevState,
-      [event.target.name]: event.target.value,
-    }));
-  }, []);
-
-  const [csvData, setCsvData] = useState([]);
-  const [filename, setFilename] = useState("No file chosen");
-
+  // 파일첨부
   const handleFileUpload = (e) => {
     if (!e.target.files) {
       return;
     }
     const file = e.target.files[0];
     const { name } = file;
-    setFilename(name);
-    // const reader = new FileReader();
-    // reader.onload = (evt) => {
-    //   if (!evt?.target?.result) {
-    //     return;
-    //   }
-    //   const { result } = evt.target;
-    //   const records = parse(result, {
-    //     columns: ["id", "value"],
-    //     delimiter: ";",
-    //     trim: true,
-    //     skip_empty_lines: true,
-    //   });
-    //   setCsvData(records);
-    // };
-    // reader.readAsBinaryString(file);
+    if (e.target.name === "thumbnail") setThumbnailFile(name);
+    if (e.target.name === "fbx") setFbxFile(name);
   };
 
   return (
@@ -170,7 +110,6 @@ const Page = () => {
       >
         <Container maxWidth="xl">
           <Stack spacing={4}>
-            {/* top row */}
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
                 <Typography variant="h4">Register</Typography>
@@ -197,10 +136,9 @@ const Page = () => {
                 </Button>
               </div>
             </Stack>
-            {/* container */}
+
             <form noValidate onSubmit={formik.handleSubmit}>
               <Box
-                component="form"
                 sx={{
                   "& .MuiTextField-root": { width: "49.5%" },
                 }}
@@ -219,73 +157,60 @@ const Page = () => {
                     required
                     id="outlined-required"
                     label="제목"
-                    defaultValue="Hello World"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.title}
                   />
                   <TextField
-                    name
+                    name="desc"
                     fullWidth
                     required
                     id="outlined-required"
                     label="설명"
-                    defaultValue="Hello World"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.desc}
                   />
                 </FlexBox>
-
                 <FlexBox>
                   <TextField
+                    name="price"
                     fullWidth
                     required
                     id="outlined-required"
                     label="가격"
-                    defaultValue="Hello World"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.price}
                   />
                   <TextField
+                    name="seller"
                     fullWidth
                     required
                     id="outlined-required"
                     label="셀러"
-                    defaultValue="Hello World"
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    value={formik.values.seller}
                   />
                 </FlexBox>
-                {/* select */}
-                {/* <FlexBox>
-                <TextField
-                  fullWidth
-                  label="Select State"
-                  name="state"
-                  onChange={handleChange}
-                  required
-                  select
-                  SelectProps={{ native: true }}
-                  value={values.state}
-                >
-                  {states.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </TextField>
-              </FlexBox> */}
                 <FlexBox>
                   <FlexBox2>
-                    {/* <Typography variant="body1" width="20%">
-                    썸네일
-                  </Typography> */}
                     <UploadBox>
                       <Button
                         component="label"
                         variant="outlined"
                         sx={{
-                          marginRight: "1rem",
                           bgcolor: "#fff",
-                          border: "none",
                           boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.1)",
                           color: "#6C6C6C",
+                          border: "1px solid #fff",
                           fontWeight: "500",
-                          textTransform: "none",
+                          "&:hover": {
+                            boxShadow: "none",
+                            backgroundColor: "rgba(99, 102, 241, 0.8)",
+                            color: "#fff",
+                          },
                         }}
                       >
                         Thumbnail File
@@ -293,28 +218,31 @@ const Page = () => {
                           type="file"
                           accept=".png"
                           hidden
+                          name="thumbnail"
                           onChange={handleFileUpload}
                         />
                       </Button>
-                      {filename}
+                      <span style={{ paddingLeft: "1rem" }}>
+                        {thumbnailFile}
+                      </span>
                     </UploadBox>
                   </FlexBox2>
                   <FlexBox2>
-                    {/* <Typography variant="body1" width="20%">
-                    fbx파일
-                  </Typography> */}
                     <UploadBox>
                       <Button
                         component="label"
                         variant="outlined"
                         sx={{
-                          marginRight: "1rem",
                           bgcolor: "#fff",
-                          border: "none",
                           boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.1)",
                           color: "#6C6C6C",
+                          border: "1px solid #fff",
                           fontWeight: "500",
-                          textTransform: "none",
+                          "&:hover": {
+                            boxShadow: "none",
+                            backgroundColor: "rgba(99, 102, 241, 0.8)",
+                            color: "#fff",
+                          },
                         }}
                       >
                         FBX File
@@ -322,10 +250,11 @@ const Page = () => {
                           type="file"
                           accept=".png"
                           hidden
+                          name="fbx"
                           onChange={handleFileUpload}
                         />
                       </Button>
-                      {filename}
+                      <span style={{ paddingLeft: "1rem" }}>{fbxFile}</span>
                     </UploadBox>
                   </FlexBox2>
                 </FlexBox>

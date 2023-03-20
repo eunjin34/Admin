@@ -19,12 +19,13 @@ import {
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import { AlertModal } from "src/components/Modal/AlertModal";
-import { GoogleLogin } from "../api/auth/googleLogin";
+
+// 구글 로그인
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
-
   const [method, setMethod] = useState("email");
   const formik = useFormik({
     initialValues: {
@@ -65,28 +66,6 @@ const Page = () => {
     setOpen(false);
   };
 
-  // // 파이어베이스 구글 로그인
-  // const handleGoogleLogin = async () => {
-  //   const provider = new GoogleAuthProvider();
-  //   console.log(googleAuth, provider);
-  //   signInWithPopup(googleAuth, provider)
-  //     .then((data) => {
-  //       console.log(data);
-  //       // setUserData(data.user.uid);
-  //       // if(userData)login();
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       // toast({
-  //       //   title: '구글 로그인 실패',
-  //       //   status: 'error', //success:성공
-  //       //   // description: "We've created your account for you.",
-  //       //   duration: 3000,//시간
-  //       //   isClosable: true, //닫기
-  //       // });
-  //     });
-  // };
-
   return (
     <>
       <AlertModal open={open} onClose={handleClose} />
@@ -113,9 +92,7 @@ const Page = () => {
         >
           <div>
             <Stack spacing={1} sx={{ mb: 3 }}>
-              <Typography variant="h4" onClick={GoogleLogin}>
-                Login
-              </Typography>
+              <Typography variant="h4">Login</Typography>
               <Typography color="text.secondary" variant="body2">
                 Don&apos;t have an account? &nbsp;
                 <Link

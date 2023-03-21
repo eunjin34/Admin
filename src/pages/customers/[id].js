@@ -20,6 +20,7 @@ import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import Router from "next/router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { TextFormContainer } from "src/components/shop/TextForm";
 
 // Style
 const FlexBox = styled("div")({
@@ -93,11 +94,22 @@ const Page = () => {
       setFbxFile(file);
     }
   };
+  const btn = () => {
+    return (
+      <Button
+        variant="contained"
+        sx={{ bgcolor: "#E242E5" }}
+        onClick={formik.handleSubmit}
+      >
+        save
+      </Button>
+    );
+  };
 
   return (
     <>
       <Head>
-        <title>Add | Soulx Admin</title>
+        <title>Detail | Soulx Admin</title>
       </Head>
       <Box
         component="main"
@@ -110,7 +122,7 @@ const Page = () => {
           <Stack spacing={4}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Add</Typography>
+                <Typography variant="h4">Detail</Typography>
               </Stack>
               <div>
                 <Button
@@ -121,16 +133,32 @@ const Page = () => {
                   }
                   onClick={() => Router.back()}
                   variant="contained"
-                  sx={{ mr: "10px" }}
+                  sx={{ mr: "12px", borderRadius: "8px" }}
                 >
                   back
                 </Button>
                 <Button
                   variant="contained"
-                  sx={{ bgcolor: "#E242E5" }}
+                  sx={{ bgcolor: "#E242E5", borderRadius: "8px" }}
                   onClick={formik.handleSubmit}
                 >
                   save
+                </Button>
+                <Button
+                  variant="contained"
+                  sx={{
+                    border: "1px solid #5048E5",
+                    color: "#5048E5",
+                    bgcolor: "#F9FAFB",
+                    borderRadius: "8px",
+                    ml: "5px",
+                    "&:hover": {
+                      color: "#fff",
+                    },
+                  }}
+                  onClick={() => console.log("삭제")}
+                >
+                  delete
                 </Button>
               </div>
             </Stack>

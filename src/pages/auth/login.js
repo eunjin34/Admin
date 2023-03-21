@@ -5,10 +5,8 @@ import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
-  Alert,
   Box,
   Button,
-  FormHelperText,
   Link,
   Stack,
   Tab,
@@ -19,9 +17,6 @@ import {
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import { AlertModal } from "src/components/Modal/AlertModal";
-
-// 구글 로그인
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 const Page = () => {
   const router = useRouter();

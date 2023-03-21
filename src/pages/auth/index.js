@@ -4,26 +4,17 @@ import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import {
-  Alert,
-  Box,
-  Button,
-  FormHelperText,
-  Link,
-  Stack,
-  Tab,
-  Tabs,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Link, Stack, Typography } from "@mui/material";
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import { AlertModal } from "src/components/Modal/AlertModal";
-import { GoogleLogin } from "../api/auth/googleLogin";
+import { GoogleLogin, socialLogin } from "../api/auth/googleLogin";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
+  const googleAuth = getAuth();
 
   const [method, setMethod] = useState("email");
   const formik = useFormik({
@@ -66,26 +57,30 @@ const Page = () => {
   };
 
   // // 파이어베이스 구글 로그인
-  // const handleGoogleLogin = async () => {
-  //   const provider = new GoogleAuthProvider();
-  //   console.log(googleAuth, provider);
-  //   signInWithPopup(googleAuth, provider)
-  //     .then((data) => {
-  //       console.log(data);
-  //       // setUserData(data.user.uid);
-  //       // if(userData)login();
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       // toast({
-  //       //   title: '구글 로그인 실패',
-  //       //   status: 'error', //success:성공
-  //       //   // description: "We've created your account for you.",
-  //       //   duration: 3000,//시간
-  //       //   isClosable: true, //닫기
-  //       // });
-  //     });
-  // };
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(googleAuth, provider)
+      .then(async (res) => {
+        if (res) {
+          const { data, statusCode } = await socialLogin(res.user.uid);
+          if (statusCode === 200) {
+            localStorage.setItem("TOKEN", data);
+            sessionStorage.setItem("authenticated", true);
+            router.push("/");
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        // toast({
+        //   title: '구글 로그인 실패',
+        //   status: 'error', //success:성공
+        //   // description: "We've created your account for you.",
+        //   duration: 3000,//시간
+        //   isClosable: true, //닫기
+        // });
+      });
+  };
 
   return (
     <>
@@ -133,7 +128,7 @@ const Page = () => {
               sx={{ mt: 3 }}
               type="submit"
               variant="contained"
-              onClick={GoogleLogin}
+              onClick={handleGoogleLogin}
             >
               Sign in with Google
             </Button>

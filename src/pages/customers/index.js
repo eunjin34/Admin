@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import { subDays, subHours } from "date-fns";
@@ -19,6 +19,7 @@ import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
 import { CustomersTable } from "src/sections/customer/customers-table";
 import { CustomersSearch } from "src/sections/customer/customers-search";
 import { applyPagination } from "src/utils/apply-pagination";
+import { getList } from "../api/shop";
 
 const now = new Date();
 
@@ -180,7 +181,10 @@ const useCustomerIds = (customers) => {
 const Page = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [dataList, setDataList] = useState([]);
+
   const customers = useCustomers(page, rowsPerPage);
+
   const customersIds = useCustomerIds(customers);
   const customersSelection = useSelection(customersIds);
 
@@ -192,10 +196,22 @@ const Page = () => {
     setRowsPerPage(event.target.value);
   }, []);
 
+  const shopList = async () => {
+    const { data, statusCode } = await getList();
+    if (statusCode === 200) {
+      console.log(data);
+      setDataList(data);
+    }
+  };
+
+  useEffect(() => {
+    shopList();
+  }, []);
+
   return (
     <>
       <Head>
-        <title>Customers | Soulx Admin</title>
+        <title>Shop | Soulx Admin</title>
       </Head>
       <Box
         component="main"
@@ -208,7 +224,7 @@ const Page = () => {
           <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between" spacing={4}>
               <Stack spacing={1}>
-                <Typography variant="h4">Customers</Typography>
+                <Typography variant="h4">Shop</Typography>
                 <Stack alignItems="center" direction="row" spacing={1}>
                   <Button
                     color="inherit"
@@ -252,10 +268,11 @@ const Page = () => {
                 </Link>
               </div>
             </Stack>
-            <CustomersSearch />
+            {/* <CustomersSearch /> */}
             <CustomersTable
-              count={data.length}
-              items={customers}
+              count={dataList.length}
+              // items={customers}
+              items={dataList}
               onDeselectAll={customersSelection.handleDeselectAll}
               onDeselectOne={customersSelection.handleDeselectOne}
               onPageChange={handlePageChange}

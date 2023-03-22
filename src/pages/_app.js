@@ -11,7 +11,6 @@ import { createEmotionCache } from "src/utils/create-emotion-cache";
 import "simplebar-react/dist/simplebar.min.css";
 import { fbAuth } from "src/javascripts/firebaseConfig";
 import { fbApp } from "src/javascripts/firebaseConfig";
-import IsLogin from "src/components/IsLogin";
 const clientSideEmotionCache = createEmotionCache();
 
 const SplashScreen = () => null;
@@ -34,7 +33,6 @@ const App = (props) => {
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <AuthProvider>
           <ThemeProvider theme={theme}>
-            {/* <IsLogin> */}
             <CssBaseline />
             <AuthConsumer>
               {(auth) =>
@@ -45,7 +43,6 @@ const App = (props) => {
                 )
               }
             </AuthConsumer>
-            {/* </IsLogin> */}
           </ThemeProvider>
         </AuthProvider>
       </LocalizationProvider>

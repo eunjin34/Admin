@@ -199,7 +199,6 @@ const Page = () => {
   const shopList = async () => {
     const { data, statusCode } = await getList();
     if (statusCode === 200) {
-      console.log(data);
       setDataList(data);
     }
   };

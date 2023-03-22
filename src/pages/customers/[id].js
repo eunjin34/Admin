@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import { subDays, subHours } from "date-fns";
@@ -17,10 +17,12 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { TextFormContainer } from "src/components/shop/TextForm";
+import { deleteList, detailList, editList } from "../api/shop";
+import { AlertModal } from "src/components/Modal/AlertModal";
 
 // Style
 const FlexBox = styled("div")({
@@ -41,6 +43,13 @@ const FlexBox2 = styled("div")({
   alignItems: "center",
 });
 
+const RowBox = styled("div")({
+  justifyContent: "space-between",
+  width: "49.5%",
+  textAlign: "center",
+  alignItems: "center",
+});
+
 const UploadBox = styled("div")({
   border: "1px solid #D1D5DB",
   padding: "10px",
@@ -52,31 +61,63 @@ const UploadBox = styled("div")({
   color: "#6C6C6C",
 });
 
-const Page = () => {
-  const formik = useFormik({
-    initialValues: {
-      title: "demo@devias.io",
-      desc: "Password123!",
-      price: "300",
-      seller: "eunjin",
-    },
-    onSubmit: (values) => {
-      const formData = new FormData();
-      for (let key in values) {
-        formData.append(`${key}`, values[key]);
-      }
-      formData.append("thumbnail", thumbnailFile);
-      formData.append("fbx", fbxFile);
-      try {
-        // await
-      } catch (err) {}
-    },
-  });
+const PreviewImg = styled("img")({
+  height: "10vw",
+});
 
+const Page = () => {
+  const { query } = useRouter();
+  const { id } = query;
+
+  // Modal state
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [result, setResult] = useState(false);
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const [data, setData] = useState([]);
   const [thumbnailFile, setThumbnailFile] = useState([]);
   const [fbxFile, setFbxFile] = useState([]);
   const [thumbnailFileName, setThumbnailFileName] = useState("No file chosen");
   const [fbxFileName, setFbxFileName] = useState("No file chosen");
+
+  const formik = useFormik({
+    initialValues: {
+      title: data?.title,
+      description: data?.description,
+      price: data?.price,
+      //   seller: data?.xroomUser?.name,
+    },
+    enableReinitialize: true,
+    onSubmit: async (values) => {
+      const formData = new FormData();
+      for (let key in values) {
+        if (!values[key]) {
+          setText("파일을 제외한 모든 항목은 필수값입니다.");
+          setOpen(true);
+          return;
+        }
+        formData.append(`${key}`, values[key]);
+      }
+      formData.append("files", thumbnailFile.length === 0 ? "" : thumbnailFile);
+      formData.append("files", fbxFile.length === 0 ? "" : fbxFile);
+
+      const { data, statusCode } = await editList(id, formData);
+      if (statusCode === 200) {
+        setOpen(true);
+        setResult(true);
+        setText("저장 완료!");
+      }
+
+      try {
+        // await
+      } catch (err) {
+        console.log(err);
+      }
+    },
+  });
 
   // 파일첨부
   const handleFileUpload = (e) => {
@@ -94,20 +135,30 @@ const Page = () => {
       setFbxFile(file);
     }
   };
-  const btn = () => {
-    return (
-      <Button
-        variant="contained"
-        sx={{ bgcolor: "#E242E5" }}
-        onClick={formik.handleSubmit}
-      >
-        save
-      </Button>
-    );
+
+  const getDetail = async () => {
+    const { data, statusCode } = await detailList(id);
+    if (statusCode === 200) {
+      setData(data);
+    }
   };
+
+  const deleteLists = async () => {
+    const { data, statusCode } = await deleteList(id);
+    if (statusCode === 200) {
+      setOpen(true);
+      setResult(true);
+      setText("삭제 완료!");
+    }
+  };
+
+  useEffect(() => {
+    getDetail();
+  }, []);
 
   return (
     <>
+      <AlertModal open={open} onClose={onClose} text={text} result={result} />
       <Head>
         <title>Detail | Soulx Admin</title>
       </Head>
@@ -156,7 +207,7 @@ const Page = () => {
                       color: "#fff",
                     },
                   }}
-                  onClick={() => console.log("삭제")}
+                  onClick={deleteLists}
                 >
                   delete
                 </Button>
@@ -185,17 +236,17 @@ const Page = () => {
                     label="제목"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.title}
+                    value={formik.values.title || ""}
                   />
                   <TextField
-                    name="desc"
+                    name="description"
                     fullWidth
                     required
-                    id="desc"
+                    id="description"
                     label="설명"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.desc}
+                    value={formik.values.description || ""}
                   />
                 </FlexBox>
                 <FlexBox>
@@ -207,9 +258,9 @@ const Page = () => {
                     label="가격"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.price}
+                    value={formik.values.price || ""}
                   />
-                  <TextField
+                  {/* <TextField
                     name="seller"
                     fullWidth
                     required
@@ -217,11 +268,18 @@ const Page = () => {
                     label="셀러"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.seller}
-                  />
+                    value={formik.values.seller || ""}
+                  /> */}
                 </FlexBox>
                 <FlexBox>
-                  <FlexBox2>
+                  <RowBox>
+                    {thumbnailFile.length === 0 && (
+                      <PreviewImg
+                        src={data?.thumbnail}
+                        alt="thumbnail"
+                      ></PreviewImg>
+                    )}
+
                     <UploadBox>
                       <Button
                         component="label"
@@ -252,7 +310,9 @@ const Page = () => {
                         {thumbnailFileName}
                       </span>
                     </UploadBox>
-                  </FlexBox2>
+                  </RowBox>
+                </FlexBox>
+                <FlexBox>
                   <FlexBox2>
                     <UploadBox>
                       <Button

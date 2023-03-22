@@ -19,7 +19,6 @@ export const GoogleLogin = () => {
   signInWithPopup(googleAuth, provider)
     .then(async (res) => {
       if (res) {
-        console.log(res);
         const { data, statusCode } = await socialLogin(res.user.uid);
         if (statusCode === 200) {
           localStorage.setItem("TOKEN", data);

@@ -1,5 +1,6 @@
 import { Modal, Box, Button, Grid, Typography } from "@mui/material";
 import { styled } from "@mui/system";
+import { useRouter } from "next/router";
 
 // styled
 const modalStyle = {
@@ -40,7 +41,18 @@ const ConfrimBtn = styled("button")({
   cursor: "pointer",
 });
 
-export const AlertModal = ({ open, onClose, text, result }) => {
+export const AlertModal = ({
+  open,
+  onClose,
+  text,
+  result,
+  cancel,
+  checkEvent,
+}) => {
+  const router = useRouter();
+  const ffffl = () => {
+    router.back();
+  };
   return (
     <Modal
       open={open}
@@ -72,8 +84,11 @@ export const AlertModal = ({ open, onClose, text, result }) => {
           justifyContent="flex-end"
           borderRadius="0 0 8px 8px"
         >
-          <CancelBtn onClick={onClose}>취소</CancelBtn>
-          <ConfrimBtn sx={{ bgcolor: result ? "#97D292" : "#DA292E" }}>
+          {cancel && <CancelBtn onClick={onClose}>취소</CancelBtn>}
+          <ConfrimBtn
+            sx={{ bgcolor: result ? "#97D292" : "#DA292E" }}
+            onClick={result ? ffffl : onClose}
+          >
             확인
           </ConfrimBtn>
         </Box>

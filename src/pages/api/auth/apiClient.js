@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useEffect } from "react";
 
 const host =
   process.env.NODE_ENV === "development"
@@ -18,7 +19,6 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   function (config) {
-    console.log(accessToken);
     // config.headers["Content-Type"] = "application/json; charset=utf-8";
     // config.headers["Authorization"] = " 토큰 값";
     return config;
@@ -33,8 +33,11 @@ apiClient.interceptors.response.use(
   function (response) {
     return response;
   },
-  function (error) {
-    errorController(error);
+  function (err) {
+    if (err.response.status === 401) {
+      console.log("401에러 발생 첫 화면으로 이동 필요");
+    }
+    errorController(err);
   }
 );
 

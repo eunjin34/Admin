@@ -17,9 +17,11 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/system";
 import { Layout as DashboardLayout } from "src/layouts/dashboard/layout";
-import Router from "next/router";
+import Router, { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { addList } from "../api/shop";
+import { AlertModal } from "src/components/Modal/AlertModal";
 
 // Style
 const FlexBox = styled("div")({
@@ -51,31 +53,68 @@ const UploadBox = styled("div")({
   color: "#6C6C6C",
 });
 
+// const validate = (values) => {
+//   const errors = {};
+//   if (!values.title) {
+//     console.log("dfdf");
+//     errors.title = "Required";
+//   } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
+//     errors.title = "Invalid email address";
+//   }
+//   return errors;
+// };
+
 const Page = () => {
+  // Modal state
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const [result, setResult] = useState(false);
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  // 파일
+  const [thumbnailFile, setThumbnailFile] = useState([]);
+  const [fbxFile, setFbxFile] = useState([]);
+  const [thumbnailFileName, setThumbnailFileName] = useState("No file chosen");
+  const [fbxFileName, setFbxFileName] = useState("No file chosen");
+
   const formik = useFormik({
     initialValues: {
-      title: "demo@devias.io",
-      desc: "Password123!",
-      price: "300",
-      seller: "eunjin",
+      title: "",
+      description: "",
+      price: "",
     },
-    onSubmit: (values) => {
+    // validate,
+    onSubmit: async (values) => {
       const formData = new FormData();
       for (let key in values) {
+        if (!values[key]) {
+          setText("모든 항목은 필수값입니다.");
+          setOpen(true);
+          return;
+        }
         formData.append(`${key}`, values[key]);
       }
-      formData.append("thumbnail", thumbnailFile);
-      formData.append("fbx", fbxFile);
+
+      if (thumbnailFile.length === 0 || fbxFile.length === 0) {
+        setText("모든 항목은 필수값입니다.");
+        setOpen(true);
+        return;
+      }
+      formData.append("files", thumbnailFile);
+      formData.append("files", fbxFile);
+      const { data, statusCode } = await addList(formData);
+      if (statusCode === 200) {
+        setOpen(true);
+        setResult(true);
+        setText("저장 완료!");
+      }
       try {
         // await
       } catch (err) {}
     },
   });
-
-  const [thumbnailFile, setThumbnailFile] = useState([]);
-  const [fbxFile, setFbxFile] = useState([]);
-  const [thumbnailFileName, setThumbnailFileName] = useState("No file chosen");
-  const [fbxFileName, setFbxFileName] = useState("No file chosen");
 
   // 파일첨부
   const handleFileUpload = (e) => {
@@ -96,6 +135,7 @@ const Page = () => {
 
   return (
     <>
+      <AlertModal open={open} onClose={onClose} text={text} result={result} />
       <Head>
         <title>Add | Soulx Admin</title>
       </Head>
@@ -157,17 +197,17 @@ const Page = () => {
                     label="제목"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.title}
+                    value={formik.values.title || ""}
                   />
                   <TextField
-                    name="desc"
+                    name="description"
                     fullWidth
                     required
-                    id="desc"
+                    id="description"
                     label="설명"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.desc}
+                    value={formik.values.description || ""}
                   />
                 </FlexBox>
                 <FlexBox>
@@ -179,9 +219,9 @@ const Page = () => {
                     label="가격"
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
-                    value={formik.values.price}
+                    value={formik.values.price || ""}
                   />
-                  <TextField
+                  {/* <TextField
                     name="seller"
                     fullWidth
                     required
@@ -190,7 +230,7 @@ const Page = () => {
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                     value={formik.values.seller}
-                  />
+                  /> */}
                 </FlexBox>
                 <FlexBox>
                   <FlexBox2>
@@ -246,7 +286,7 @@ const Page = () => {
                         FBX File
                         <input
                           type="file"
-                          accept=".png"
+                          accept=".fbx"
                           hidden
                           name="fbx"
                           onChange={handleFileUpload}

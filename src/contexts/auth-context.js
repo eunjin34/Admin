@@ -81,6 +81,7 @@ export const AuthProvider = (props) => {
     } catch (err) {
       console.error(err);
     }
+    console.log(isAuthenticated);
     if (isAuthenticated) {
       const user = {
         id: "5e86809283e28b96d2d38537",

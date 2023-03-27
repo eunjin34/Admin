@@ -21,6 +21,7 @@ import { AlertModal } from "src/components/Modal/AlertModal";
 const Page = () => {
   const router = useRouter();
   const auth = useAuth();
+  // auth : 함수 모음
   const [method, setMethod] = useState("email");
   const formik = useFormik({
     initialValues: {

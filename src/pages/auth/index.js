@@ -1,85 +1,25 @@
-import { useCallback, useState } from "react";
+import React, { useState } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useRouter } from "next/navigation";
-import { useFormik } from "formik";
-import * as Yup from "yup";
 import { Box, Button, Link, Stack, Typography } from "@mui/material";
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as AuthLayout } from "src/layouts/auth/layout";
 import { AlertModal } from "src/components/Modal/AlertModal";
-import { GoogleLogin, socialLogin } from "../api/auth/googleLogin";
-import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 const Page = () => {
-  const router = useRouter();
   const auth = useAuth();
-  const googleAuth = getAuth();
-
-  const [method, setMethod] = useState("email");
-  const formik = useFormik({
-    initialValues: {
-      email: "demo@devias.io",
-      password: "Password123!",
-      submit: null,
-    },
-    validationSchema: Yup.object({
-      email: Yup.string()
-        .email("Must be a valid email")
-        .max(255)
-        .required("Email is required"),
-      password: Yup.string().max(255).required("Password is required"),
-    }),
-    onSubmit: async (values, helpers) => {
-      try {
-        await auth.signIn(values.email, values.password);
-        router.push("/");
-      } catch (err) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
-        helpers.setSubmitting(false);
-      }
-    },
-  });
-
-  const handleMethodChange = useCallback((event, value) => {
-    setMethod(value);
-  }, []);
-
-  // const handleSkip = useCallback(() => {
-  //   auth.skip();
-  //   router.push("/");
-  // }, [auth, router]);
 
   const [open, setOpen] = useState(false);
   const handleClose = () => {
     setOpen(false);
   };
 
-  // // 파이어베이스 구글 로그인
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    signInWithPopup(googleAuth, provider)
-      .then(async (res) => {
-        if (res) {
-          const { data, statusCode } = await socialLogin(res.user.uid);
-          if (statusCode === 200) {
-            localStorage.setItem("TOKEN", data);
-            sessionStorage.setItem("authenticated", true);
-            router.push("/");
-          }
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        // toast({
-        //   title: '구글 로그인 실패',
-        //   status: 'error', //success:성공
-        //   // description: "We've created your account for you.",
-        //   duration: 3000,//시간
-        //   isClosable: true, //닫기
-        // });
-      });
+  const login = async () => {
+    try {
+      await auth.googleLogin();
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -128,7 +68,7 @@ const Page = () => {
               sx={{ mt: 3 }}
               type="submit"
               variant="contained"
-              onClick={handleGoogleLogin}
+              onClick={login}
             >
               Sign in with Google
             </Button>

@@ -13,7 +13,9 @@ import { fbAuth } from "src/javascripts/firebaseConfig";
 import { fbApp } from "src/javascripts/firebaseConfig";
 const clientSideEmotionCache = createEmotionCache();
 
-const SplashScreen = () => null;
+const SplashScreen = () => {
+  return <>로딩중</>;
+};
 
 const App = (props) => {
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;

@@ -1,8 +1,9 @@
 import apiClient from "./auth/apiClient";
 
-export const getList = async () => {
+export const getList = async (params) => {
   try {
     const res = await apiClient.get("/admin/shop");
+    console.log(params);
     return res.data;
   } catch (err) {
     console.log(err);

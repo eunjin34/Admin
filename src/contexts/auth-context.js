@@ -4,19 +4,20 @@ import {
   useEffect,
   useReducer,
   useRef,
+  useState,
 } from "react";
-import PropTypes from "prop-types";
+import { socialLogin } from "src/pages/api/auth/googleLogin";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import apiClient from "src/pages/api/auth/apiClient";
+import { useRouter } from "next/router";
+
+// import PropTypes from "prop-types";
 
 const HANDLERS = {
   INITIALIZE: "INITIALIZE",
   SIGN_IN: "SIGN_IN",
   SIGN_OUT: "SIGN_OUT",
-};
-
-const initialState = {
-  isAuthenticated: false,
-  isLoading: true,
-  user: null,
+  GOOGLE_LOGIN: "GOOGLE_LOGIN",
 };
 
 const handlers = {
@@ -53,6 +54,21 @@ const handlers = {
       user: null,
     };
   },
+  [HANDLERS.GOOGLE_LOGIN]: (state, action) => {
+    const token = action.payload;
+    return {
+      ...state,
+      ...(token
+        ? {
+            isAuthenticated: true,
+            isLoading: false,
+            token: true,
+          }
+        : {
+            isLoading: false,
+          }),
+    };
+  },
 };
 
 const reducer = (state, action) => {
@@ -60,11 +76,20 @@ const reducer = (state, action) => {
 };
 
 // 이 컨텍스트의 역할은 앱 트리를 통해 인증 상태를 전파하는 것.
+// 인증 상태값 전역으로 공유하는 역할
 export const AuthContext = createContext({ undefined });
+// 1. 전역상태관리 객체 생성(초기값 : 없음)
 
 export const AuthProvider = (props) => {
+  const router = useRouter();
+  const [token, setToken] = useState([]);
   const { children } = props;
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(reducer, {
+    isAuthenticated: false,
+    isLoading: true,
+    token: token,
+    user: null,
+  });
   const initialized = useRef(false);
 
   const initialize = async () => {
@@ -81,7 +106,7 @@ export const AuthProvider = (props) => {
     } catch (err) {
       console.error(err);
     }
-    console.log(isAuthenticated);
+
     if (isAuthenticated) {
       const user = {
         id: "5e86809283e28b96d2d38537",
@@ -124,48 +149,74 @@ export const AuthProvider = (props) => {
   //   });
   // };
 
-  // const signIn = async (email, password) => {
-  //   if (email !== "demo@devias.io" || password !== "Password123!") {
-  //     throw new Error("Please check your email and password");
-  //   }
+  const signIn = async (email, password) => {
+    if (email !== "demo@devias.io" || password !== "Password123!") {
+      throw new Error("Please check your email and password");
+    }
 
-  //   try {
-  //     window.sessionStorage.setItem("authenticated", "true");
-  //   } catch (err) {
-  //     console.error(err);
-  //   }
+    try {
+      window.sessionStorage.setItem("authenticated", "true");
+    } catch (err) {
+      console.error(err);
+    }
 
-  //   const user = {
-  //     id: "5e86809283e28b96d2d38537",
-  //     avatar: "/assets/avatars/avatar-anika-visser.png",
-  //     name: "Anika Visser",
-  //     email: "anika.visser@devias.io",
-  //   };
+    const user = {
+      id: "5e86809283e28b96d2d38537",
+      avatar: "/assets/avatars/avatar-anika-visser.png",
+      name: "Anika Visser",
+      email: "anika.visser@devias.io",
+    };
 
-  //   dispatch({
-  //     type: HANDLERS.SIGN_IN,
-  //     payload: user,
-  //   });
-  // };
+    dispatch({
+      type: HANDLERS.SIGN_IN,
+      payload: user,
+    });
+  };
 
-  // const signUp = async (email, name, password) => {
-  //   throw new Error("Sign up is not implemented");
-  // };
+  const signUp = async (email, name, password) => {
+    throw new Error("Sign up is not implemented");
+  };
 
-  // const signOut = () => {
-  //   dispatch({
-  //     type: HANDLERS.SIGN_OUT,
-  //   });
-  // };
+  const signOut = () => {
+    dispatch({
+      type: HANDLERS.SIGN_OUT,
+    });
+  };
+
+  const googleLogin = async () => {
+    const googleAuth = getAuth();
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(googleAuth, provider)
+      .then(async (res) => {
+        if (res) {
+          const { data, statusCode } = await socialLogin(res.user.uid);
+          if (statusCode === 200) {
+            localStorage.setItem("TOKEN", data);
+            sessionStorage.setItem("authenticated", true);
+
+            dispatch({
+              type: HANDLERS.GOOGLE_LOGIN,
+              payload: data,
+            });
+            router.push("/");
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
+    // 2. 하위 컴포넌트에게 전달하는 역할
     <AuthContext.Provider
       value={{
         ...state,
         // skip,
-        // signIn,
-        // signUp,
-        // signOut,
+        signIn,
+        signUp,
+        signOut,
+        googleLogin,
       }}
     >
       {children}
@@ -173,10 +224,11 @@ export const AuthProvider = (props) => {
   );
 };
 
-AuthProvider.propTypes = {
-  children: PropTypes.node,
-};
+// AuthProvider.propTypes = {
+//   children: PropTypes.node,
+// };
 
+// 3. context 변화를 구독하는 컴포넌트(이건 변수로 만듬), app.js파일에 있음
 export const AuthConsumer = AuthContext.Consumer;
 
 export const useAuthContext = () => useContext(AuthContext);

@@ -2,6 +2,7 @@ import NextLink from "next/link";
 import { usePathname } from "next/navigation";
 import PropTypes from "prop-types";
 import UserCircle from "@heroicons/react/24/outline/UserCircleIcon";
+import ArrowLeftOnRectangle from "@heroicons/react/24/outline/ArrowLeftOnRectangleIcon";
 import {
   Box,
   Divider,
@@ -23,6 +24,11 @@ export const SideNav = (props) => {
   const { open, onClose } = props;
   const pathname = usePathname();
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+
+  const logout = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
 
   const content = (
     <Scrollbar
@@ -81,7 +87,6 @@ export const SideNav = (props) => {
             </SvgIcon>
           </Box>
         </Box>
-
         <Divider sx={{ borderColor: "neutral.700" }} />
         <Box
           component="nav"
@@ -118,6 +123,25 @@ export const SideNav = (props) => {
           </Stack>
         </Box>
         <Divider sx={{ borderColor: "neutral.700" }} />
+        <Box
+          sx={{
+            alignItems: "center",
+            backgroundColor: "rgba(255, 255, 255, 0.04)",
+            borderRadius: 1,
+            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            mt: 2,
+            p: "12px",
+            m: 2,
+          }}
+          onClick={logout}
+        >
+          Logout
+          <SvgIcon sx={{ color: "neutral.500" }}>
+            <ArrowLeftOnRectangle />
+          </SvgIcon>
+        </Box>
       </Box>
     </Scrollbar>
   );

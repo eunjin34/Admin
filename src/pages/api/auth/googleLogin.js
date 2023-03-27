@@ -1,7 +1,6 @@
 // 구글 로그인
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import apiClient from "./apiClient";
-const googleAuth = getAuth();
 
 export const socialLogin = async (params) => {
   try {
